@@ -10,13 +10,13 @@ using boost::asio::ip::tcp;
 class session : public std::enable_shared_from_this<session> {
 public:
   session(tcp::socket &&socket) : socket_(std::move(socket)) {}
-  void start() {
-
-       do_read();
+  void start() 
+  {
+    do_read();
   }
 
 private:
-  void do_read() /*читаем и разбираем запрос */
+  void do_read() /*читаем и разбираем запрос. Если клиент присылает EXIT - сервер останавливает свою работу */
   {
     auto self(shared_from_this());
     socket_.async_read_some(
@@ -72,7 +72,7 @@ private:
           else {
             socket_.close(ec);
             std::cout << "Session is closed" << std::endl;
-            throw("Exit filename");
+            throw("Exit filename");// выбрасываем исключение, по которому остановим работу сервера
           }
         });
   }
@@ -159,12 +159,11 @@ private:
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
           if (!ec) {
-
-            std::make_shared<session>(std::move(socket))->start();
+            auto s = std::make_shared<session>(std::move(socket));
+            s -> start();
           }
         });
   }
-
   tcp::acceptor acceptor_;
 };
 
