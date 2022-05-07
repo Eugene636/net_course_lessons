@@ -11,12 +11,8 @@ class session : public std::enable_shared_from_this<session> {
 public:
   session(tcp::socket &&socket) : socket_(std::move(socket)) {}
   void start() {
-    //    std::cout <<"New client with id:" << std::this_thread::get_id() <<
-    //    std::endl;
-    void (*p)() = do_read;
-    std::thread new_client(p);
-    new_client.join()
-    //    do_read();
+
+       do_read();
   }
 
 private:
